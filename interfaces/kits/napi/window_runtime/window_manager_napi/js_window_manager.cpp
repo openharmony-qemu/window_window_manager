@@ -335,6 +335,9 @@ static bool GetWindowTypeAndParentId(napi_env env, uint32_t& parentId, WindowTyp
     if (resultValue >= static_cast<uint32_t>(ApiWindowType::TYPE_BASE) &&
         resultValue < static_cast<uint32_t>(ApiWindowType::TYPE_END)) {
         winType = JS_TO_NATIVE_WINDOW_TYPE_MAP.at(static_cast<ApiWindowType>(resultValue));
+    } else if (resultValue >= static_cast<uint32_t>(WindowType::SYSTEM_WINDOW_BASE) &&
+        resultValue < static_cast<uint32_t>(WindowType::SYSTEM_WINDOW_END)) {
+        winType = static_cast<WindowType>(resultValue);
     } else {
         WLOGFE("Type %{public}u is not supported", resultValue);
         return false;
@@ -621,6 +624,9 @@ bool JsWindowManager::ParseRequiredConfigOption(napi_env env, napi_value jsObjec
         if (winType >= static_cast<uint32_t>(ApiWindowType::TYPE_BASE) &&
             winType < static_cast<uint32_t>(ApiWindowType::TYPE_END)) {
             option.SetWindowType(JS_TO_NATIVE_WINDOW_TYPE_MAP.at(static_cast<ApiWindowType>(winType)));
+        } else if (winType >= static_cast<uint32_t>(WindowType::SYSTEM_WINDOW_BASE) &&
+            winType < static_cast<uint32_t>(WindowType::SYSTEM_WINDOW_END)) {
+            option.SetWindowType(static_cast<WindowType>(winType));
         } else {
             TLOGE(WmsLogTag::DEFAULT, "Invalid winType");
             return false;

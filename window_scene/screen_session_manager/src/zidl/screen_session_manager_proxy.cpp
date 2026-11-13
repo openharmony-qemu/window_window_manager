@@ -2422,8 +2422,21 @@ DMError ScreenSessionManagerProxy::GetAllScreenInfos(std::vector<sptr<ScreenInfo
         TLOGW(WmsLogTag::DMS, "GetAllScreenInfos: SendRequest failed");
         return DMError::DM_ERROR_IPC_FAILED;
     }
-    DMError ret = static_cast<DMError>(reply.ReadInt32());
-    MarshallingHelper::UnmarshallingVectorParcelableObj<ScreenInfo>(reply, screenInfos);
+    int32_t result = 0;
+    if (!reply.ReadInt32(result)) {
+        TLOGE(WmsLogTag::DMS, "GetAllScreenInfos: missing service result");
+        return DMError::DM_ERROR_IPC_FAILED;
+    }
+    DMError ret = static_cast<DMError>(result);
+    if (ret != DMError::DM_OK) {
+        return ret;
+    }
+    std::vector<sptr<ScreenInfo>> decoded;
+    if (!MarshallingHelper::UnmarshallingVectorParcelableObj<ScreenInfo>(reply, decoded)) {
+        TLOGE(WmsLogTag::DMS, "GetAllScreenInfos: incomplete screen information");
+        return DMError::DM_ERROR_IPC_FAILED;
+    }
+    screenInfos = std::move(decoded);
     return ret;
 }
 

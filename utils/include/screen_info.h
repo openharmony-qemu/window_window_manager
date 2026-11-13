@@ -59,7 +59,8 @@ public:
     DEFINE_VAR_DEFAULT_FUNC_GET_SET(ScreenId, RsId, rsId, SCREEN_ID_INVALID);
     DEFINE_VAR_FUNC_GET(std::vector<sptr<SupportedScreenModes>>, Modes, modes);
 protected:
-    const static uint32_t MAX_SUPPORTED_SCREEN_MODES_SIZE = 20;
+    // QEMU/DRM may report more than 20 real modes. Keep a finite IPC bound.
+    const static uint32_t MAX_SUPPORTED_SCREEN_MODES_SIZE = 256;
     bool InnerUnmarshalling(Parcel& parcel);
 };
 } // namespace OHOS::Rosen

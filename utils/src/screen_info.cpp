@@ -18,6 +18,14 @@
 namespace OHOS::Rosen {
 bool ScreenInfo::Marshalling(Parcel &parcel) const
 {
+    if (modes_.size() > MAX_SUPPORTED_SCREEN_MODES_SIZE) {
+        return false;
+    }
+    for (const auto& mode : modes_) {
+        if (mode == nullptr) {
+            return false;
+        }
+    }
     bool res = parcel.WriteString(name_) && parcel.WriteUint64(id_) &&
         parcel.WriteUint32(virtualWidth_) && parcel.WriteUint32(virtualHeight_) &&
         parcel.WriteFloat(virtualPixelRatio_) && parcel.WriteUint64(lastParent_) && parcel.WriteUint64(parent_) &&
@@ -29,9 +37,6 @@ bool ScreenInfo::Marshalling(Parcel &parcel) const
         parcel.WriteBool(isExtend_) && parcel.WriteString(serialNumber_) && parcel.WriteUint64(rsId_) &&
         parcel.WriteUint32(mirrorWidth_) && parcel.WriteUint32(mirrorHeight_);
     if (!res) {
-        return false;
-    }
-    if (modes_.size() > MAX_SUPPORTED_SCREEN_MODES_SIZE) {
         return false;
     }
     for (uint32_t modeIndex = 0; modeIndex < modes_.size(); modeIndex++) {
@@ -79,7 +84,8 @@ bool ScreenInfo::InnerUnmarshalling(Parcel& parcel)
     if (!res1) {
         return false;
     }
-    if (size > MAX_SUPPORTED_SCREEN_MODES_SIZE) {
+    constexpr size_t MODE_BYTES = 4 * sizeof(uint32_t);
+    if (size > MAX_SUPPORTED_SCREEN_MODES_SIZE || size > parcel.GetReadableBytes() / MODE_BYTES) {
         return false;
     }
     modes_.clear();

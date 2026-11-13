@@ -150,6 +150,10 @@ ohos_shared_library("screen_session_manager") {
   ]
 
   defines = []
+  if (product_name == "arm64_virt" || product_name == "armv7a_virt" ||
+      product_name == "x86_64_virt") {
+    defines += [ "WM_QEMU_SOFTWARE_CAPTURE" ]
+  }
   if (window_manager_feature_subscribe_motion) {
     if (defined(global_parts_info) && defined(global_parts_info.msdp_motion)) {
       defines += [ "WM_SUBSCRIBE_MOTION_ENABLE" ]

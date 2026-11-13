@@ -149,10 +149,7 @@ const std::unordered_set<WindowType> INVALID_SYSTEM_WINDOW_TYPE = {
 const std::unordered_set<WindowType> INVALID_SCB_WINDOW_TYPE = {
     WindowType::WINDOW_TYPE_WALLPAPER,
     WindowType::WINDOW_TYPE_DESKTOP,
-    WindowType::WINDOW_TYPE_DOCK_SLICE,
-    WindowType::WINDOW_TYPE_STATUS_BAR,
     WindowType::WINDOW_TYPE_KEYGUARD,
-    WindowType::WINDOW_TYPE_NAVIGATION_BAR,
     WindowType::WINDOW_TYPE_LAUNCHER_RECENT,
     WindowType::WINDOW_TYPE_LAUNCHER_DOCK
 };

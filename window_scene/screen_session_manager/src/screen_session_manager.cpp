@@ -231,7 +231,13 @@ constexpr uint32_t COMMON_EVENT_SERVICE_ID = 3299;
 const bool IS_SUPPORT_PC_MODE = system::GetBoolParameter("const.window.support_window_pcmode_switch", false);
 const std::set<std::string> INDIVIDUAL_SCREEN_GROUP_SET = {
     "CeliaView", "DevEcoViewer", "Cooperation-multi", "HwCast_AppModeDisplay", "HiCar", "SuperLauncher"};
+#ifdef WM_QEMU_SOFTWARE_CAPTURE
+// Software rendering can finish after the hardware deadline while starting an app.
+// Keep a finite budget; do not retry, skip permission checks, or accept a null image.
+const long GET_HDR_PIXELMAP_TIMEOUT = 10000;
+#else
 const long GET_HDR_PIXELMAP_TIMEOUT = 2000;
+#endif
 const int32_t CV_WAIT_UPDATE_AVAILABLE_MS = 500;
 const static uint32_t PIXMAP_VECTOR_SIZE = 2;
 static const uint32_t SDR_PIXMAP = 0;
@@ -10321,7 +10327,7 @@ std::shared_ptr<Media::PixelMap> ScreenSessionManager::GetScreenSnapshot(Display
         TLOGNFE(WmsLogTag::DMS, "TakeSurfaceCapture failed");
         return nullptr;
     }
-    std::shared_ptr<Media::PixelMap> screenshot = callback->GetResult(GET_HDR_PIXELMAP_TIMEOUT);  // wait for <= 2000ms
+    std::shared_ptr<Media::PixelMap> screenshot = callback->GetResult(GET_HDR_PIXELMAP_TIMEOUT);
     if (screenshot == nullptr) {
         TLOGNFE(WmsLogTag::DMS, "Failed to get pixelmap from RS, return nullptr!");
     } else {
