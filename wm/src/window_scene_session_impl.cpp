@@ -4344,8 +4344,13 @@ WMError WindowSceneSessionImpl::SetWindowTitle(const std::string& title)
         return WMError::WM_OK;
     }
     if (!IsDecorEnable()) {
-        TLOGE(WmsLogTag::WMS_DECOR, "DecorEnable is false");
-        return WMError::WM_ERROR_INVALID_WINDOW;
+        if (WindowHelper::IsMainWindow(GetType())) {
+            auto abilityContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityContext>(GetContext());
+            if (abilityContext != nullptr) {
+                abilityContext->SetMissionLabel(title);
+            }
+        }
+        return WMError::WM_OK;
     }
     if (WindowHelper::IsMainWindow(GetType())) {
         auto abilityContext = AbilityRuntime::Context::ConvertTo<AbilityRuntime::AbilityContext>(GetContext());
@@ -4844,7 +4849,8 @@ WMError WindowSceneSessionImpl::Recover(uint32_t reason, const SnapshotAnimation
         return WMError::WM_ERROR_INVALID_WINDOW;
     }
     
-    if (IsPadAndNotFreeMultiWindowCompatibleMode()) {
+    if (IsPadAndNotFreeMultiWindowCompatibleMode() ||
+        (IsPcOrFreeMultiWindowCapabilityEnabled() && !IsPcOrPadFreeMultiWindowMode())) {
         TLOGE(WmsLogTag::WMS_LAYOUT_PC, "The device is not supported");
         return WMError::WM_OK;
     }

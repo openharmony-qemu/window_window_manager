@@ -4610,7 +4610,8 @@ WMError WindowSessionImpl::SetWindowTitleMoveEnabled(bool enable)
     if (IsWindowSessionInvalid()) {
         return WMError::WM_ERROR_INVALID_WINDOW;
     }
-    if (IsPadAndNotFreeMultiWindowCompatibleMode()) {
+    if (IsPadAndNotFreeMultiWindowCompatibleMode() ||
+        (IsPcOrFreeMultiWindowCapabilityEnabled() && !IsPcOrPadFreeMultiWindowMode())) {
         TLOGE(WmsLogTag::WMS_DECOR, "The is PcAppInPad, not supported");
         return WMError::WM_OK;
     }
@@ -5986,10 +5987,20 @@ WMError WindowSessionImpl::SetTitleButtonVisible(bool isMaximizeVisible, bool is
     if (!IsPcOrFreeMultiWindowCapabilityEnabled()) {
         return WMError::WM_ERROR_DEVICE_NOT_SUPPORT;
     }
-    if (GetUIContentSharedPtr() == nullptr || !IsDecorEnable()) {
+    if (GetUIContentSharedPtr() == nullptr) {
         return WMError::WM_ERROR_INVALID_WINDOW;
     }
+#if defined(__has_attribute) && __has_attribute(retain)
+    __attribute__((used, retain))
+#elif defined(__GNUC__)
+    __attribute__((used))
+#endif
+    static const char kQemuWmPadDecorCompatMarker[] = "OHOS_QEMU_WM_PAD_DECOR_COMPAT_V1";
+    (void)kQemuWmPadDecorCompatMarker;
     windowTitleVisibleFlags_ = { isMaximizeVisible, isMinimizeVisible, isSplitVisible, isCloseVisible };
+    if (!IsDecorEnable()) {
+        return WMError::WM_OK;
+    }
     UpdateTitleButtonVisibility();
     return WMError::WM_OK;
 }
